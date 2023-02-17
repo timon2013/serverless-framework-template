@@ -1,0 +1,37 @@
+deployment:
+  service: NAME_SOLUTION
+  rootDomainName: DOMAIN_NAME.COM
+  domain:
+    dev:  dev.${self:custom.globalConfig.rootDomainName}
+    test: test.${self:custom.globalConfig.rootDomainName}
+    prod: ${self:custom.globalConfig.rootDomainName}
+  myRegion:
+    dev: eu-central-1
+    test: eu-central-1
+    prod: eu-central-1
+  myProfile:
+    dev: 
+      profile: AWS_PROFILE_NAME
+      accountID: "AWS_ACCOUNT_ID"
+    test:
+      profile: AWS_PROFILE_NAME
+      accountID: "AWS_ACCOUNT_ID"
+    prod: 
+      profile: AWS_PROFILE_NAME
+      accountID: "AWS_ACCOUNT_ID"
+  myStage: ${opt:stage, self:provider.stage}
+  serviceCertificate: ${self:custom.globalConfig.service}
+  serviceRoute53: ${self:custom.globalConfig.service}
+  pathRole: ${self:custom.globalConfig.service}
+
+  deploymentBucket:
+    dev: 
+      eu-central-1: BUCKET_NAME_FOR_DEPLOYMENT
+      us-east-1: BUCKET_NAME_FOR_DEPLOYMENT
+    test: 
+      eu-central-1: BUCKET_NAME_FOR_DEPLOYMENT
+      us-east-1: BUCKET_NAME_FOR_DEPLOYMENT
+    prod:
+      eu-central-1: BUCKET_NAME_FOR_DEPLOYMENT
+      us-east-1: BUCKET_NAME_FOR_DEPLOYMENT
+ 

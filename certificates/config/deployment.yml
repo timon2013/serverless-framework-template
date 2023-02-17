@@ -1,0 +1,11 @@
+deployment:
+  myRegion:
+    dev: ${self:custom.globalConfig.myRegion.dev}
+    test: ${self:custom.globalConfig.myRegion.test}
+    prod: ${self:custom.globalConfig.myRegion.prod}
+    # us-east-1
+  myProfile:
+    dev: ${self:custom.globalConfig.myProfile.dev.profile}
+    test: ${self:custom.globalConfig.myProfile.test.profile}
+    prod: ${self:custom.globalConfig.myProfile.prod.profile}
+  myStage: ${opt:stage, self:provider.stage}
