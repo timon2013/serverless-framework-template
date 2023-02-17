@@ -1,0 +1,56 @@
+#Deployed
+# sls deploy
+# sls deploy --stage prod
+# sls deploy --stage prod --region us-east-1
+
+
+# Requirement
+# npm install serverless-deployment-bucket --save-dev
+
+service: ${self:custom.globalConfig.service}-certificates
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: dev
+  region: ${self:custom.deployment.myRegion.${self:custom.deployment.myStage}}
+  profile: ${self:custom.deployment.myProfile.${self:custom.deployment.myStage}}
+  deploymentPrefix: ${self:custom.globalConfig.service}-serverless
+  deploymentBucket:
+    name: ${self:custom.globalConfig.deploymentBucket.${self:custom.deployment.myStage}.${opt:region, self:provider.region}}
+
+plugins:
+  - serverless-deployment-bucket
+
+custom:
+  version: v0.001
+  deployment: ${file(config/deployment.yml):deployment}
+  globalConfig: ${file(../globalConfig/deployment.yml):deployment}
+  pathRole: ${self:custom.deployment.myStage}-${self:custom.globalConfig.pathRole}
+  deploymentBucket:
+    blockPublicAccess: true
+    tags:
+      - Key: Environment
+        Value: production
+
+resources:
+  Conditions:
+    isProdStage:
+      Fn::Equals:
+        - ${self:custom.deployment.myStage}
+        - 'prod'
+    isNotProdStage: !Not [!Condition isProdStage]
+
+  Resources:
+    DomainCertificates: ${file(./resources/acmCertificates.yml):DomainCertificates}
+    DomainCertificateARNParameter: ${file(./resources/acmCertificates.yml):DomainCertificateARNParameter}
+
+  Outputs:
+    DomainCertificatesARN:
+      Description: Domain Certificates ARN
+      Value: !Ref DomainCertificates
+      Export:
+        Name: ${self:custom.deployment.myStage}-${self:service}-DomainCertificatesARN
+

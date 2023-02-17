@@ -1,0 +1,24 @@
+---
+DomainCertificates:
+  Type: "AWS::CertificateManager::Certificate"
+  # Condition: isNotProdStage
+  Properties: 
+    DomainName: ${self:custom.globalConfig.domain.${self:custom.deployment.myStage}}
+    SubjectAlternativeNames: 
+      - '*.${self:custom.globalConfig.domain.${self:custom.deployment.myStage}}'
+    DomainValidationOptions:
+        - DomainName: ${self:custom.globalConfig.domain.${self:custom.deployment.myStage}}
+          HostedZoneId: ${ssm(${self:custom.deployment.myRegion.${self:custom.deployment.myStage}}):/${self:custom.deployment.myStage}/${self:custom.globalConfig.service}/HostedZoneId}
+    ValidationMethod: DNS
+
+DomainCertificateARNParameter:
+  Type: AWS::SSM::Parameter
+  Condition: isNotProdStage
+  Properties:
+    Name: /${self:custom.deployment.myStage}/${self:custom.globalConfig.service}/DomainCertificatesARN/${self:custom.globalConfig.domain.${self:custom.deployment.myStage}}
+    Type: String
+    Value: !Ref DomainCertificates
+    Description: Domain Certificates ARN
+    # AllowedPattern: "^[a-zA-Z]{1,10}$"
+    Tags:
+      environment: ${self:custom.deployment.myStage}
